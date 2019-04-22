@@ -8,7 +8,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.body-inner {
+  min-height: 100vh;
+  padding: 100px 15px;
+  background-color: #f7f7f7;
 }

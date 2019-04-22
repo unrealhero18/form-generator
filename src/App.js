@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
-import './App.css';
+import FormGenerator from './components/FormGenerator';
+import { enumTypes, formConfig } from './utils/fixtures.js';
 
 class App extends Component {
   render() {
     return (
       <div className="app-root">
-        Initial commit
+        <FormGenerator
+          settings={{
+            enumTypes,
+            formConfig
+          }}
+        />
       </div>
     );
   }
