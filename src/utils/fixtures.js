@@ -16,7 +16,7 @@ export const enumTypes = {
   ]
 };
 
-export const formConfig = {
+export const formData = {
   code: 'Person',
   attributes: [
     {

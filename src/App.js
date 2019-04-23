@@ -1,20 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import FormGenerator from './components/FormGenerator';
-import { enumTypes, formConfig } from './utils/fixtures.js';
+import { enumTypes, formData } from './utils/fixtures.js';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="app-root">
-        <FormGenerator
-          settings={{
-            enumTypes,
-            formConfig
-          }}
-        />
-      </div>
-    );
-  }
-}
+const App = () => (
+  <div className="app-root">
+    <FormGenerator
+      enumTypes={enumTypes}
+      formData={formData}
+    />
+  </div>
+);
 
 export default App;

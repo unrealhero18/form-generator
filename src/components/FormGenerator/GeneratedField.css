@@ -1,0 +1,8 @@
+.generated-field._date .react-datepicker-wrapper,
+.generated-field._date .react-datepicker__input-container {
+  display: block;
+}
+
+.generated-field._date .react-datepicker__day--selected {
+  background-color: #2185d0;
+}
