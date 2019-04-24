@@ -14,6 +14,7 @@ class GeneratedForm extends PureComponent {
 
     this.onChange = this.onChange.bind( this );
     this.onChangeDate = this.onChangeDate.bind( this );
+    this.onChangeNumber = this.onChangeNumber.bind( this );
     this.onSubmit = this.onSubmit.bind( this );
 
     // initialization the form fields in React state
@@ -52,7 +53,6 @@ class GeneratedForm extends PureComponent {
     if ( e && ! e.target.value ) {
       this.onChange( e );
     } else {
-
       this.setState({
         ...this.state,
         data: {
@@ -60,8 +60,46 @@ class GeneratedForm extends PureComponent {
           [ name ]: value
         }
       });
-
     }
+  }
+
+  onChangeNumber( e, type ) {
+    let { name, value } = e.target;
+
+    // allow only numbers ( int || float )
+    if ( value ) {
+      const { length } = value;
+      const isDotAtEnding = length > 0 && value.charAt( length - 1 ) === '.';
+      const inMinusOnStart = length === 1 && value.charAt( 0 ) === '-';
+      let regex = null;
+
+      if ( type === 'float' ) {
+
+        if ( ! isDotAtEnding && ! inMinusOnStart ) {
+          regex = /[-]?([0-9]*[.])?[0-9]+/;
+        }
+
+      } else if ( type === 'int' ) {
+
+        if ( ! inMinusOnStart ) {
+          regex = /^[-]?\d+$/;
+        }
+
+      }
+
+      if ( regex ) {
+        const matchedValue = value.match( regex );
+        value = matchedValue ? matchedValue[ 0 ] : this.state.data[ name ];
+      }
+    }
+
+    this.setState({
+      ...this.state,
+      data: {
+        ...this.state.data,
+        [ name ]: value
+      }
+    })
   }
 
   onSubmit( e ) {
@@ -87,10 +125,12 @@ class GeneratedForm extends PureComponent {
                     <Grid.Column key={attr.code}>
                       <GeneratedField
                         attr={attr}
-                        data={this.state.data}
-                        errors={this.state.errors}
+                        data={this.state.data[ attr.code ]}
+                        error={this.state.errors[ attr.code ]}
                         onChange={this.onChange}
                         onChangeDate={this.onChangeDate}
+                        onChangeNumber={this.onChangeNumber}
+                        onKeyDown={this.onKeyDown}
                       />
                     </Grid.Column>
                   )

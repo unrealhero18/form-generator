@@ -12,9 +12,10 @@ const GeneratedField = ({
     type = 'string'
   },
   data,
-  errors,
+  error,
   onChange,
-  onChangeDate
+  onChangeDate,
+  onChangeNumber
 }) => (
   <Fragment>
     { type === 'date' && (
@@ -28,7 +29,20 @@ const GeneratedField = ({
           onChange={value => onChangeDate( null, value, code )}
           onChangeRaw={e => onChangeDate( e )}
           placeholderText={title}
-          selected={data[ code ] ? data[ code ] : null}
+          selected={data ? data : null}
+        />
+      </Form.Field>
+    )}
+
+    { ( type === 'int' || type === 'float' ) && (
+      <Form.Field className='generated-field _int'>
+        <Form.Input
+          error={!!error}
+          label={title}
+          name={code}
+          onChange={e => onChangeNumber( e, type )}
+          placeholder={title}
+          value={data}
         />
       </Form.Field>
     )}
@@ -36,17 +50,17 @@ const GeneratedField = ({
     { type === 'string' && (
       <Form.Field className='generated-field _string'>
         <Form.Input
-          error={!!errors[ code ]}
+          error={!!error}
           label={title}
           name={code}
           onChange={onChange}
           placeholder={title}
-          value={data[ code ]}
+          value={data}
         />
       </Form.Field>
     )}
 
-    { errors[ code ] && <InlineError text={errors[ code ]} /> }
+    { error && <InlineError text={error} /> }
   </Fragment>
 );
 
@@ -66,10 +80,11 @@ GeneratedField.propTypes = {
     ]),
     validation: PropTypes.object
   }),
-  data: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired,
-  onChange: PropTypes.func,
-  onChangeDate: PropTypes.func
+  data: PropTypes.any.isRequired,
+  error: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onChangeDate: PropTypes.func.isRequired,
+  onChangeNumber: PropTypes.func.isRequired
 }
 
 export default GeneratedField;
