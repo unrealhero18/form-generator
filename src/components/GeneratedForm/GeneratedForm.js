@@ -1,11 +1,14 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Divider, Form, Grid } from 'semantic-ui-react';
-
+import { registerLocale } from 'react-datepicker';
+import uk from 'date-fns/locale/uk';
 import GeneratedField from './GeneratedField';
-import './FormGenerator.css';
+import './GeneratedForm.css';
 
-class FormGenerator extends PureComponent {
+registerLocale( 'uk', uk );
+
+class GeneratedForm extends PureComponent {
   constructor( props ) {
     super( props );
 
@@ -117,4 +120,4 @@ class FormGenerator extends PureComponent {
   }
 }
 
-export default FormGenerator;
+export default GeneratedForm;

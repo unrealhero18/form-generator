@@ -1,10 +1,10 @@
 import React from 'react';
-import FormGenerator from './components/FormGenerator';
+import GeneratedForm from './components/GeneratedForm';
 import { enumTypes, formData } from './utils/fixtures.js';
 
 const App = () => (
   <div className="app-root">
-    <FormGenerator
+    <GeneratedForm
       enumTypes={enumTypes}
       formData={formData}
     />

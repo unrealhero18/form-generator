@@ -1,13 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'semantic-ui-react';
-import DatePicker, { registerLocale } from "react-datepicker";
-import uk from 'date-fns/locale/uk';
-
+import DatePicker from 'react-datepicker';
 import { InlineError } from './messages';
 import './GeneratedField.css';
-
-registerLocale( 'uk', uk );
 
 const GeneratedField = ({
   attr: {
