@@ -15,6 +15,7 @@ class GeneratedForm extends PureComponent {
     this.onChange = this.onChange.bind( this );
     this.onChangeDate = this.onChangeDate.bind( this );
     this.onChangeNumber = this.onChangeNumber.bind( this );
+    this.onCheck = this.onCheck.bind( this );
     this.onSelect = this.onSelect.bind( this );
     this.onSubmit = this.onSubmit.bind( this );
     this.updateData = this.updateData.bind( this );
@@ -75,8 +76,12 @@ class GeneratedForm extends PureComponent {
     this.updateData( name, value );
   }
 
+  onCheck( e, data ) {
+    this.updateData( data.name, data.checked );
+  }
+
   onSelect( e, selectOptions ) {
-    this.updateData( selectOptions.name, selectOptions.value )
+    this.updateData( selectOptions.name, selectOptions.value );
   }
 
   onSubmit( e ) {
@@ -120,6 +125,7 @@ class GeneratedForm extends PureComponent {
                         onChange={this.onChange}
                         onChangeDate={this.onChangeDate}
                         onChangeNumber={this.onChangeNumber}
+                        onCheck={this.onCheck}
                         onKeyDown={this.onKeyDown}
                         onSelect={this.onSelect}
                       />

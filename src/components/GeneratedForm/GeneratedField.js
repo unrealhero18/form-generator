@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'semantic-ui-react';
+import { Checkbox, Form } from 'semantic-ui-react';
 import DatePicker from 'react-datepicker';
 import { InlineError } from './messages';
 import { EnumField } from './fields'
@@ -19,11 +19,24 @@ const GeneratedField = ({
   onChange,
   onChangeDate,
   onChangeNumber,
+  onCheck,
   onSelect
 }) => (
   <Fragment>
+    { type === 'boolean' && (
+      <Form.Field className='generated-field _boolean' error={!!error}>
+        <Checkbox
+          checked={!!data}
+          label={title}
+          name={code}
+          onChange={onCheck}
+          type='checkbox'
+        />
+      </Form.Field>
+    )}
+
     { type === 'date' && (
-      <Form.Field className='generated-field _date'>
+      <Form.Field className='generated-field _date' error={!!error}>
         <label>{title}</label>
 
         <DatePicker
@@ -49,9 +62,8 @@ const GeneratedField = ({
     )}
 
     { ( type === 'int' || type === 'float' ) && (
-      <Form.Field className='generated-field _int'>
+      <Form.Field className='generated-field _int' error={!!error}>
         <Form.Input
-          error={!!error}
           inputMode='numeric'
           label={title}
           name={code}
@@ -63,9 +75,8 @@ const GeneratedField = ({
     )}
 
     { type === 'string' && (
-      <Form.Field className='generated-field _string'>
+      <Form.Field className='generated-field _string' error={!!error}>
         <Form.Input
-          error={!!error}
           label={title}
           name={code}
           onChange={onChange}

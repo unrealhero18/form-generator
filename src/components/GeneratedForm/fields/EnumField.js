@@ -35,11 +35,10 @@ const EnumField = ({
   }
 
   return (
-    <Form.Field className='generated-field _enum'>
+    <Form.Field className='generated-field _enum' error={!!error}>
       <label>{title}</label>
 
       <Select
-        error={!!error}
         name={code}
         options={options}
         placeholder={title}
