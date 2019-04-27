@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Container, Divider, Form, Grid } from 'semantic-ui-react';
 import { registerLocale } from 'react-datepicker';
 import uk from 'date-fns/locale/uk';
-import GeneratedField from './GeneratedField';
+import { GeneratedField, MultipleGeneratedFields } from './fields'
 import './GeneratedForm.css';
 
 registerLocale( 'uk', uk );
@@ -12,13 +12,15 @@ class GeneratedForm extends PureComponent {
   constructor( props ) {
     super( props );
 
-    this.onChange = this.onChange.bind( this );
-    this.onChangeDate = this.onChangeDate.bind( this );
-    this.onChangeNumber = this.onChangeNumber.bind( this );
-    this.onCheck = this.onCheck.bind( this );
-    this.onSelect = this.onSelect.bind( this );
-    this.onSubmit = this.onSubmit.bind( this );
+    this.events.onChange = this.events.onChange.bind( this );
+    this.events.onChangeDate = this.events.onChangeDate.bind( this );
+    this.events.onChangeNumber = this.events.onChangeNumber.bind( this );
+    this.events.onCheck = this.events.onCheck.bind( this );
+    this.events.onSelect = this.events.onSelect.bind( this );
+    this.events.onSubmit = this.events.onSubmit.bind( this );
     this.updateData = this.updateData.bind( this );
+    this.updateMultipleData = this.updateMultipleData.bind( this );
+    this.updateMultipleFields = this.updateMultipleFields.bind( this );
 
     // initialization the form fields in React state
     const { formData } = props;
@@ -28,7 +30,11 @@ class GeneratedForm extends PureComponent {
       const { attributes } = formData;
 
       attributes instanceof Array && attributes.forEach( attr => {
-        formCollection[ attr.code ] = '';
+        if ( attr.multiple ) {
+          formCollection[ attr.code ] = [''];
+        } else {
+          formCollection[ attr.code ] = '';
+        }
       });
     }
 
@@ -42,51 +48,105 @@ class GeneratedForm extends PureComponent {
     }
   }
 
-  onChange( e ) {
-    this.updateData( e.target.name, e.target.value );
-  }
+  events = {
+    onChange( e ) {
+      const { name, value } = e.target;
+      const multiplePath = this.getMultiplePath( name );
 
-  onChangeDate( e, value, name ) {
-    if ( e && ! e.target.value ) {
-      this.updateData( e.target.name, e.target.value );
-    } else {
-      this.updateData( name, value );
+      if ( multiplePath ) {
+        this.updateMultipleData( multiplePath, value );
+      } else {
+        this.updateData( name, value );
+      }
+    },
+
+    onChangeDate( e, value, name ) {
+      if ( e && ! e.target.value ) {
+        // onChangeRaw
+        const eventName = e.target.name;
+        const eventValue = e.target.value;
+        const multiplePath = this.getMultiplePath( eventName );
+
+        if ( multiplePath ) {
+          this.updateMultipleData( multiplePath, eventValue );
+        } else {
+          this.updateData( eventName, eventValue );
+        }
+
+      } else {
+        // onChange
+        const multiplePath = this.getMultiplePath( name );
+
+        if ( multiplePath ) {
+          this.updateMultipleData( multiplePath, value );
+        } else {
+          this.updateData( name, value );
+        }
+      }
+    },
+
+    onChangeNumber( e, type ) {
+      let { name, value } = e.target;
+
+      // allow typing only numbers ( int || float )
+      if ( value ) {
+        let regex = null;
+
+        if ( type === 'float' ) {
+          regex = /^-?\d*?\.?\d*$/;
+        } else if ( type === 'int' ) {
+          regex = /^-?\d*$/;
+        }
+
+        if ( regex ) {
+          const matchedValue = value.match( regex );
+          value = matchedValue ? matchedValue[ 0 ] : this.state.data[ name ];
+        }
+      }
+
+      const multiplePath = this.getMultiplePath( name );
+
+      if ( multiplePath ) {
+        this.updateMultipleData( multiplePath, value );
+      } else {
+        this.updateData( name, value );
+      }
+    },
+
+    onCheck( e, data ) {
+      this.updateData( data.name, data.checked );
+    },
+
+    onSelect( e, selectOptions ) {
+      const { name, value } = selectOptions;
+      const multiplePath = this.getMultiplePath( name );
+
+      if ( multiplePath ) {
+        this.updateMultipleData( multiplePath, value );
+      } else {
+        this.updateData( name, value );
+      }
+    },
+
+    onSubmit( e ) {
+      e.preventDefault();
+      console.log( 'Submit' );
     }
   }
 
-  onChangeNumber( e, type ) {
-    let { name, value } = e.target;
+  getMultiplePath( name = '' ) {
+    const matched = name.match( /\[.d?\]/g );
 
-    // allow only numbers ( int || float )
-    if ( value ) {
-      let regex = null;
+    if ( matched ) {
+      const arrayLiteral = matched[ 0 ];
 
-      if ( type === 'float' ) {
-        regex = /^-?\d*?\.?\d*$/;
-      } else if ( type === 'int' ) {
-        regex = /^-?\d*$/;
-      }
-
-      if ( regex ) {
-        const matchedValue = value.match( regex );
-        value = matchedValue ? matchedValue[ 0 ] : this.state.data[ name ];
+      return {
+        code: name.slice( 0, name.indexOf( arrayLiteral ) ),
+        arrayLiteral
       }
     }
 
-    this.updateData( name, value );
-  }
-
-  onCheck( e, data ) {
-    this.updateData( data.name, data.checked );
-  }
-
-  onSelect( e, selectOptions ) {
-    this.updateData( selectOptions.name, selectOptions.value );
-  }
-
-  onSubmit( e ) {
-    e.preventDefault();
-    console.log( 'Submit' );
+    return null;
   }
 
   updateData( name, value ) {
@@ -101,8 +161,58 @@ class GeneratedForm extends PureComponent {
     });
   }
 
+  updateMultipleData( multiplePath, value ) {
+    const { code, arrayLiteral } = multiplePath;
+    const { data } = this.state;
+
+    // get item index of the multiple fields array
+    const index = arrayLiteral.slice( 1, -1 ) * 1;
+
+    // copy current state of multiple field
+    const currentData = data[ code ].concat();
+
+    // update single record
+    currentData[ index ] = value;
+
+    // send to update state
+    this.updateData( code, currentData );
+  }
+
+  updateMultipleFields( action, code, index ) {
+    const { data, errors } = this.state;
+    let currentData = data[ code ].concat()
+    let currentErrors = errors[ code ].concat();
+
+    if ( action === 'remove' ) {
+      currentData.splice( index, 1 );
+      currentErrors.splice( index, 1 );
+    }
+
+    if ( action === 'add' ) {
+      currentData.push( '' );
+      currentErrors.push( '' );
+    }
+
+    this.setState({
+      data: {
+        ...data,
+        [ code ]: currentData
+      },
+      errors: {
+        ...errors,
+        [ code ]: currentErrors
+      }
+    });
+  }
+
   render() {
-    const { attributes, code } = this.props.formData;
+    const { data, errors } = this.state;
+    const {
+      enumTypes,
+      formData: {
+        attributes, code
+      }
+    } = this.props;
 
     return (
       <div className='form-generator-wrap'>
@@ -110,24 +220,33 @@ class GeneratedForm extends PureComponent {
           <Form
             className='form-generator'
             name={code}
-            onSubmit={this.onSubmit}
+            onSubmit={this.events.onSubmit}
           >
             { !!( attributes && attributes.length ) && (
               <Grid stackable columns={2}>
                 { attributes.map( attr => {
+                  if ( attr.multiple && attr.type !== 'boolean' ) {
+                    return (
+                      <MultipleGeneratedFields
+                        allData={data}
+                        attr={attr}
+                        errors={errors}
+                        events={this.events}
+                        enumTypes={enumTypes}
+                        key={attr.code}
+                        updateMultipleFields={this.updateMultipleFields}
+                      />
+                    )
+                  }
+
                   return (
                     <Grid.Column key={attr.code}>
                       <GeneratedField
                         attr={attr}
-                        enumTypes={this.props.enumTypes}
-                        data={this.state.data[ attr.code ]}
-                        error={this.state.errors[ attr.code ]}
-                        onChange={this.onChange}
-                        onChangeDate={this.onChangeDate}
-                        onChangeNumber={this.onChangeNumber}
-                        onCheck={this.onCheck}
-                        onKeyDown={this.onKeyDown}
-                        onSelect={this.onSelect}
+                        enumTypes={enumTypes}
+                        data={data[ attr.code ]}
+                        error={errors[ attr.code ]}
+                        events={this.events}
                       />
                     </Grid.Column>
                   )
@@ -138,9 +257,7 @@ class GeneratedForm extends PureComponent {
             <Divider hidden section />
 
             <Container textAlign='right'>
-              <Form.Button primary>
-                Зберегти
-              </Form.Button>
+              <Form.Button primary>Зберегти</Form.Button>
             </Container>
           </Form>
         )}

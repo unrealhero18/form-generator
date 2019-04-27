@@ -2,8 +2,8 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Checkbox, Form } from 'semantic-ui-react';
 import DatePicker from 'react-datepicker';
-import { InlineError } from './messages';
-import { EnumField } from './fields'
+import { InlineError } from '../messages';
+import { EnumField } from '.';
 import './GeneratedField.css';
 
 const GeneratedField = ({
@@ -16,11 +16,13 @@ const GeneratedField = ({
   data,
   enumTypes,
   error,
-  onChange,
-  onChangeDate,
-  onChangeNumber,
-  onCheck,
-  onSelect
+  events: {
+    onChange,
+    onChangeDate,
+    onChangeNumber,
+    onCheck,
+    onSelect
+  }
 }) => (
   <Fragment>
     { type === 'boolean' && (
@@ -108,9 +110,13 @@ GeneratedField.propTypes = {
   }),
   data: PropTypes.any.isRequired,
   error: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onChangeDate: PropTypes.func.isRequired,
-  onChangeNumber: PropTypes.func.isRequired
+  events: PropTypes.shape({
+    onChange: PropTypes.func.isRequired,
+    onChangeDate: PropTypes.func.isRequired,
+    onChangeNumber: PropTypes.func.isRequired,
+    onCheck: PropTypes.func.isRequired,
+    onSelect: PropTypes.func.isRequired
+  }).isRequired
 }
 
 export default GeneratedField;

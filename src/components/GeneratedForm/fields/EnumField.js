@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Form, Select } from 'semantic-ui-react';
 import generateHierarchicOptionsList from '../../../utils/generateHierarchicOptionsList';
 
@@ -47,6 +48,27 @@ const EnumField = ({
       />
     </Form.Field>
   )
+}
+
+EnumField.propTypes = {
+  attr: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+    enumType: PropTypes.string,
+    multiple: PropTypes.bool,
+    title: PropTypes.string.isRequired,
+    type: PropTypes.oneOf([
+      'int',
+      'float',
+      'string',
+      'date',
+      'boolean',
+      'enum'
+    ]),
+    validation: PropTypes.object
+  }),
+  enumTypes: PropTypes.object.isRequired,
+  error: PropTypes.string.isRequired,
+  onSelect: PropTypes.func.isRequired
 }
 
 export default EnumField

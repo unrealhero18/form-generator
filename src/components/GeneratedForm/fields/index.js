@@ -1,3 +1,5 @@
-import EnumField from './EnumField'
+import EnumField from './EnumField';
+import GeneratedField from './GeneratedField';
+import MultipleGeneratedFields from './MultipleGeneratedFields';
 
-export { EnumField }
+export { EnumField, GeneratedField, MultipleGeneratedFields }
