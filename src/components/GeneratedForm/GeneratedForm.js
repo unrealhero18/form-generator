@@ -15,7 +15,9 @@ class GeneratedForm extends PureComponent {
     this.onChange = this.onChange.bind( this );
     this.onChangeDate = this.onChangeDate.bind( this );
     this.onChangeNumber = this.onChangeNumber.bind( this );
+    this.onSelect = this.onSelect.bind( this );
     this.onSubmit = this.onSubmit.bind( this );
+    this.updateData = this.updateData.bind( this );
 
     // initialization the form fields in React state
     const { formData } = props;
@@ -40,26 +42,14 @@ class GeneratedForm extends PureComponent {
   }
 
   onChange( e ) {
-    this.setState({
-      ...this.state,
-      data: {
-        ...this.state.data,
-        [ e.target.name ]: e.target.value
-      }
-    });
+    this.updateData( e.target.name, e.target.value );
   }
 
   onChangeDate( e, value, name ) {
     if ( e && ! e.target.value ) {
-      this.onChange( e );
+      this.updateData( e.target.name, e.target.value );
     } else {
-      this.setState({
-        ...this.state,
-        data: {
-          ...this.state.data,
-          [ name ]: value
-        }
-      });
+      this.updateData( name, value );
     }
   }
 
@@ -70,18 +60,18 @@ class GeneratedForm extends PureComponent {
     if ( value ) {
       const { length } = value;
       const isDotAtEnding = length > 0 && value.charAt( length - 1 ) === '.';
-      const inMinusOnStart = length === 1 && value.charAt( 0 ) === '-';
+      const isMinusOnStart = length === 1 && value.charAt( 0 ) === '-';
       let regex = null;
 
       if ( type === 'float' ) {
 
-        if ( ! isDotAtEnding && ! inMinusOnStart ) {
+        if ( ! isDotAtEnding && ! isMinusOnStart ) {
           regex = /[-]?([0-9]*[.])?[0-9]+/;
         }
 
       } else if ( type === 'int' ) {
 
-        if ( ! inMinusOnStart ) {
+        if ( ! isMinusOnStart ) {
           regex = /^[-]?\d+$/;
         }
 
@@ -93,18 +83,28 @@ class GeneratedForm extends PureComponent {
       }
     }
 
+    this.updateData( name, value );
+  }
+
+  onSelect( e, selectOptions ) {
+    this.updateData( selectOptions.name, selectOptions.value )
+  }
+
+  onSubmit( e ) {
+    e.preventDefault();
+    console.log( 'Submit' );
+  }
+
+  updateData( name, value ) {
+    if ( ! name ) return;
+
     this.setState({
       ...this.state,
       data: {
         ...this.state.data,
         [ name ]: value
       }
-    })
-  }
-
-  onSubmit( e ) {
-    e.preventDefault();
-    console.log( 'Submit' );
+    });
   }
 
   render() {
@@ -125,12 +125,14 @@ class GeneratedForm extends PureComponent {
                     <Grid.Column key={attr.code}>
                       <GeneratedField
                         attr={attr}
+                        enumTypes={this.props.enumTypes}
                         data={this.state.data[ attr.code ]}
                         error={this.state.errors[ attr.code ]}
                         onChange={this.onChange}
                         onChangeDate={this.onChangeDate}
                         onChangeNumber={this.onChangeNumber}
                         onKeyDown={this.onKeyDown}
+                        onSelect={this.onSelect}
                       />
                     </Grid.Column>
                   )

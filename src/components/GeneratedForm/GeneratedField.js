@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'semantic-ui-react';
 import DatePicker from 'react-datepicker';
 import { InlineError } from './messages';
+import { EnumField } from './fields'
 import './GeneratedField.css';
 
 const GeneratedField = ({
@@ -11,11 +12,14 @@ const GeneratedField = ({
     title,
     type = 'string'
   },
+  attr,
   data,
+  enumTypes,
   error,
   onChange,
   onChangeDate,
-  onChangeNumber
+  onChangeNumber,
+  onSelect
 }) => (
   <Fragment>
     { type === 'date' && (
@@ -34,10 +38,21 @@ const GeneratedField = ({
       </Form.Field>
     )}
 
+    { type === 'enum' && (
+      <EnumField
+        attr={attr}
+        error={error}
+        data={data}
+        enumTypes={enumTypes}
+        onSelect={onSelect}
+      />
+    )}
+
     { ( type === 'int' || type === 'float' ) && (
       <Form.Field className='generated-field _int'>
         <Form.Input
           error={!!error}
+          inputMode='numeric'
           label={title}
           name={code}
           onChange={e => onChangeNumber( e, type )}
