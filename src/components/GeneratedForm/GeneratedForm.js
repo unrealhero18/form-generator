@@ -58,23 +58,12 @@ class GeneratedForm extends PureComponent {
 
     // allow only numbers ( int || float )
     if ( value ) {
-      const { length } = value;
-      const isDotAtEnding = length > 0 && value.charAt( length - 1 ) === '.';
-      const isMinusOnStart = length === 1 && value.charAt( 0 ) === '-';
       let regex = null;
 
       if ( type === 'float' ) {
-
-        if ( ! isDotAtEnding && ! isMinusOnStart ) {
-          regex = /[-]?([0-9]*[.])?[0-9]+/;
-        }
-
+        regex = /^-?\d*?\.?\d*$/;
       } else if ( type === 'int' ) {
-
-        if ( ! isMinusOnStart ) {
-          regex = /^[-]?\d+$/;
-        }
-
+        regex = /^-?\d*$/;
       }
 
       if ( regex ) {
