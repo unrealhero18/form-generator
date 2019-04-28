@@ -59,7 +59,7 @@ class Validation {
 
   /* eslint-disable no-loop-func */
   _evalVariables( text, rule, option ) {
-    const regexp = /\$\$[^$]*\$\$/g;
+    const regexp = /\${2}[^$]*\${2}/;
     let matched;
 
     // date to human format

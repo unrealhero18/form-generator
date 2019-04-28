@@ -64,28 +64,16 @@ class GeneratedForm extends PureComponent {
       }
     },
 
-    onChangeDate( e, value, name ) {
-      if ( e && ! e.target.value ) {
-        // onChangeRaw
-        const eventName = e.target.name;
-        const eventValue = e.target.value;
-        const multiplePath = this.getMultiplePath( eventName );
+    onChangeDate( value, name ) {
+      // set midday for date
+      value.setHours( '12' );
 
-        if ( multiplePath ) {
-          this.updateMultipleData( multiplePath, eventValue );
-        } else {
-          this.updateData( eventName, eventValue );
-        }
+      const multiplePath = this.getMultiplePath( name );
 
+      if ( multiplePath ) {
+        this.updateMultipleData( multiplePath, value );
       } else {
-        // onChange
-        const multiplePath = this.getMultiplePath( name );
-
-        if ( multiplePath ) {
-          this.updateMultipleData( multiplePath, value );
-        } else {
-          this.updateData( name, value );
-        }
+        this.updateData( name, value );
       }
     },
 
@@ -141,8 +129,24 @@ class GeneratedForm extends PureComponent {
       const errors = this.validator.validate( form, stateData );
 
       if ( errors.isValid ) {
-        console.log( stateData );
+        // prepare data to print
+        let printData = Object.assign( {}, stateData );
+
+        for ( let key in printData ) {
+          if ( printData.hasOwnProperty( key ) ) {
+            const item = printData[ key ];
+
+            if ( item instanceof Date ) {
+              printData[ key ] = item.toISOString();
+            }
+          }
+        }
+
+        // print form to console
+        console.log( printData );
+
       } else {
+
         this.setState( () => {
           return {
             errors: {
@@ -151,6 +155,7 @@ class GeneratedForm extends PureComponent {
             }
           }
         });
+
       }
     }
   }

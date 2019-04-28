@@ -45,8 +45,7 @@ const GeneratedField = ({
           dateFormat="dd/MM/yyyy"
           locale='uk'
           name={code}
-          onChange={value => onChangeDate( null, value, code )}
-          onChangeRaw={e => onChangeDate( e )}
+          onChange={value => onChangeDate( value, code )}
           placeholderText={title}
           selected={data ? data : null}
         />
