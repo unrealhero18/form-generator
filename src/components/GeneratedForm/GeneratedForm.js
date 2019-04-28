@@ -4,6 +4,7 @@ import { Container, Divider, Form, Grid } from 'semantic-ui-react';
 import { registerLocale } from 'react-datepicker';
 import uk from 'date-fns/locale/uk';
 import { GeneratedField, MultipleGeneratedFields } from './fields'
+import Validation from '../../lib/Validation';
 import './GeneratedForm.css';
 
 registerLocale( 'uk', uk );
@@ -46,6 +47,9 @@ class GeneratedForm extends PureComponent {
         ...formCollection
       }
     }
+
+    // initialization form validation
+    this.validator = new Validation();
   }
 
   events = {
@@ -90,17 +94,18 @@ class GeneratedForm extends PureComponent {
 
       // allow typing only numbers ( int || float )
       if ( value ) {
-        let regex = null;
+        let regexp = null;
 
         if ( type === 'float' ) {
-          regex = /^-?\d*?\.?\d*$/;
+          regexp = /^-?\d*?\.?\d*$/;
         } else if ( type === 'int' ) {
-          regex = /^-?\d*$/;
+          regexp = /^-?\d*$/;
         }
 
-        if ( regex ) {
-          const matchedValue = value.match( regex );
+        if ( regexp ) {
+          const matchedValue = value.match( regexp );
           value = matchedValue ? matchedValue[ 0 ] : this.state.data[ name ];
+          value = Number( value );
         }
       }
 
@@ -130,7 +135,23 @@ class GeneratedForm extends PureComponent {
 
     onSubmit( e ) {
       e.preventDefault();
-      console.log( 'Submit' );
+
+      const { formData: form } = this.props;
+      const { errors: stateErrors, data: stateData } = this.state;
+      const errors = this.validator.validate( form, stateData );
+
+      if ( errors.isValid ) {
+        console.log( stateData );
+      } else {
+        this.setState( () => {
+          return {
+            errors: {
+              ...stateErrors,
+              ...errors
+            }
+          }
+        });
+      }
     }
   }
 
