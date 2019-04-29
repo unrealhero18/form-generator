@@ -20,7 +20,7 @@
   * `/fields/MultipleGeneratedFields.js` - компонент поєднуючий (`multiple`) поля
   * `/messages/InlineError.js` - компонент для сповіщення помилок валідації
 * `src/lib/Validation.js` - бібліотека валідації
-* `src/utils/fixtures.js` - початкові данні
+* `src/utils/fixtures.js` - початкові дані
 * `src/utils/generateHierarchicOptionsList.js` - функція для побудови ієрархічного списку
 
 ## Для того щоб додати новий вид валідації:
@@ -34,31 +34,31 @@
 * `message` - повідомлення при помилці ( при використанні конструкції `$$validatorName$$`, цей вираз буде підмінено параметром `option` )
 
 ```js
-  constructor( props ) {
-    super( props );
+constructor( props ) {
+  super( props );
 
-    this.validation = new Validation();
-    this.validator.addValidator( 'step', function( value, option, type ) {
-      if ( ! value ) {
-        return true;
-      } else if ( type !== 'int' ) {
-        return true;
-      } else {
-        return value % option === 0;
-      }
-    }, 'Допустимий крок для значень $$step$$' );
+  this.validation = new Validation();
+  this.validator.addValidator( 'step', function( value, option, type ) {
+    if ( ! value ) {
+      return true;
+    } else if ( type !== 'int' ) {
+      return true;
+    } else {
+      return value % option === 0;
+    }
+  }, 'Допустимий крок для значень $$step$$' );
 }
 ```
 Або додати валідатор в тілі приватного методу `_initValidators` в бібліотеці `Validation.js`:
 ```js
 _initValidators() {
-    this._addValidator( 'required', function( value, enable ) {
-        if ( ! enable ) {
-            return true;
-        } else {
-            return !!value;
-        }
-    });
+  this._addValidator( 'required', function( value, enable ) {
+    if ( ! enable ) {
+      return true;
+    } else {
+      return !!value;
+    }
+  });
 }
 ```
 _Примітка: при конфігурації min/max для типу date очікується Date об'єкт_
@@ -72,7 +72,7 @@ _Примітка: при конфігурації min/max для типу date 
 * `title` _(string)(optional)_ - текст для <label>
 * `placeholder` _(string)(optional)_ - текст для placeholder
 * `value` _(any)(required)_ - значення для поля ( контролюється за допомогою React state )
-* `onChange` _(function)(equired) - обробник взаємодії з полем
+* `onChange` _(function)(equired)_ - обробник взаємодії з полем
   * `onChange` - для звичайних текстових полів
   * `onChangeDate` - для datapicker
   * `onChangeNumber` - для числових полів ( int|float )
@@ -100,4 +100,4 @@ _Примітка: при конфігурації min/max для типу date 
     {/* END:Custom attributes types */}
 </Fragment>
 ```
-_Інші доступні елементи форм [Form](https://react.semantic-ui.com/collections/form/)_
+_Інші доступні елементи [Form](https://react.semantic-ui.com/collections/form/)_
