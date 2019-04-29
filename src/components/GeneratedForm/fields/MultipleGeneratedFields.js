@@ -17,24 +17,59 @@ class MultipleGeneratedFields extends PureComponent {
     }
   }
 
+
+  /**
+   * decrementFields - Remove the multiple field
+   *
+   * @param  {number} field The field's index
+   * @return {null}
+   */
   decrementFields( field ) {
+    // copy data from state
     let newMultipleFields = this.state.multipleFields.concat();
+
+    // find the the multiple field
     const fieldIndex = newMultipleFields.indexOf( field );
+
+    // remove the multiple field
     newMultipleFields.splice( fieldIndex, 1 );
+
+    // reindex all multiple fields
     newMultipleFields = newMultipleFields.map( ( field, index ) => index );
 
+    // inform the parent component that multople field was removed
     this.props.updateMultipleFields( 'remove', this.props.attr.code, fieldIndex );
+
+    // send action to actualizate React state
     this.updateState( newMultipleFields );
   }
 
+
+  /**
+   * incrementFields - Add the multiple field
+   *
+   * @return {null}
+   */
   incrementFields() {
     const { multipleFields } = this.state;
+
+    // add the multiple field
     const newMultipleFields = multipleFields.concat( multipleFields.length );
 
+    // inform the parent component that multople field was add
     this.props.updateMultipleFields( 'add', this.props.attr.code );
+
+    // send action to actualizate React state
     this.updateState( newMultipleFields );
   }
 
+
+  /**
+   * updateState - Set updated multiple field's index to React state
+   *
+   * @param  {array} newMultipleFields The array of indexes
+   * @return {null}
+   */
   updateState( newMultipleFields ) {
     this.setState( () => {
       return {

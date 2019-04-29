@@ -18,7 +18,27 @@ class Validation {
     }
   }
 
-  // private methods
+  //** PRIVATE METHODS **/
+
+
+  /**
+   * _attrValidate - Validate the single attribute or multiple attribute.
+   *
+   * @param  {object} attr The form attribute
+   * @param  {string} attr.code The attribute name
+   * @param  {boolean} attr.multiple Does attribute can have the few fields
+   * @param  {string?} attr.type The type of data. Availabe: int, float, string( default ), date, boolean, enum
+   * @param  {object?} attr.validation The validation rules
+   * @param  {boolean} attr.validation.required Makes the element required
+   * @param  {regexp} attr.validation.pattern Makes the element require a valid pattern
+   * @param  {string} attr.validation.email Makes the element require a valid email
+   * @param  {number} attr.validation.min Makes the element require a given minimum
+   * @param  {number} attr.validation.max Makes the element require a given maximum.
+   * @param  {number} attr.validation.minlength Makes the element require a given minimum length
+   * @param  {number} attr.validation.maxlength Makes the element require a given maximum length
+   * @param  {*} value The value of related field|fields
+   * @return {null}
+   */
   _attrValidate( attr, value ) {
     const { code, multiple, type, validation } = attr;
     let result = null;
@@ -28,6 +48,7 @@ class Validation {
       ? new Array( value.length ).fill( '' )
       : '';
 
+    // loop through validation rules
     Object.keys( validation ).forEach( rule => {
       const ruleParam = validation[ rule ];
 
@@ -53,12 +74,27 @@ class Validation {
     });
   }
 
+
+  /**
+   * _addValidator - This method adding validators
+   *
+   * @param  {string} name The validator name
+   * @param  {function} f    The validator function
+   * @return {null}
+   */
   _addValidator( name, f ) {
     this._validators[ name ] = f;
   }
 
-  /* eslint-disable no-loop-func */
-  _evalVariables( text, rule, option ) {
+  /**
+   * _evalVariables - This method allow generate the dynamic error messages. $$validatorName$$ replacing by validator option
+   *
+   * @param  {string} text The raw message
+   * @param  {*} option The value that will used to replacement
+   * @return {string} - Returning the compiled text or the same text if variables not presented
+   */
+  _evalVariables( text, option ) {
+    /* eslint-disable no-loop-func */
     const regexp = /\${2}[^$]*\${2}/;
     let matched;
 
@@ -77,10 +113,17 @@ class Validation {
       })
     }
 
-    return text
+    return text;
+    /* eslint-enable no-loop-func */
   }
-  /* eslint-enable no-loop-func */
 
+
+  /**
+   * _humanizeDate - Tranfrom js Date to convenient format
+   *
+   * @param  {date} date
+   * @return {string} - Example ( 01/01/2018 )
+   */
   _humanizeDate( date ) {
     let day = date.getDate();
     let month = date.getMonth();
@@ -92,6 +135,12 @@ class Validation {
     return `${day}/${month}/${year}`;
   }
 
+
+  /**
+   * _initValidators - Initializing the default validators
+   *
+   * @return {null}
+   */
   _initValidators() {
     this._addValidator( 'required', function( value, enable ) {
       if ( ! enable ) {
@@ -169,10 +218,27 @@ class Validation {
     })
   }
 
+
+  /**
+   * _isObject - Check if argument is object
+   *
+   * @param  {object} object The object to check
+   * @return {boolean} - Result of checking
+   */
   _isObject( object ) {
     return object === Object( object );
   }
 
+
+  /**
+   * _test - Test the value via validator
+   *
+   * @param  {string} rule  The validator name
+   * @param  {*} param The validator option
+   * @param  {*} value Field's value for test
+   * @param  {string?} type The type of value. Availabe: int, float, string( default ), date, boolean, enum
+   * @return {boolean} - The test result
+   */
   _test( rule, param, value, type ) {
     const validator = this._validators[ rule ];
 
@@ -181,10 +247,20 @@ class Validation {
     }
   }
 
+
+  /**
+   * _setError - Commit the error message with related field.
+   *
+   * @param  {string} code The attribute name
+   * @param  {string} rule The validator name
+   * @param  {*} option The validator option
+   * @param  {number?} index The array element of multiple field
+   * @return {null}
+   */
   _setError( code, rule, option, index ) {
     const { _errors: errors } = this;
 
-    const message = this._evalVariables( this._messages[ rule ], rule, option );
+    const message = this._evalVariables( this._messages[ rule ], option );
 
     if ( index !== undefined ) {
       if ( errors[ code ] ) {
@@ -194,26 +270,45 @@ class Validation {
       errors[ code ] = message;
     }
 
-    // validation fail
+    // set validation status as `fail`
     this._errors.isValid = false;
   }
 
-  // public methods
+  //** PUBLIC METHODS **/
+
+  /**
+   * addValidator - Allow to extend default validators
+   *
+   * @param  {string} name Custom validator name
+   * @param  {function} validator Custom validator callback
+   * @param  {string} message Custom validator fail message
+   * @return {null}
+   */
   addValidator( name, validator, message ) {
     this._messages[ name ] = message;
     this._addValidator( name, validator );
   }
 
+
+  /**
+   * validate - Validate form data
+   *
+   * @param  {object} form Contains the form fields config ( field name, data type, validation rules )
+   * @param  {object} state Filled form data from React state
+   * @return {object} Return the object with fields names as keys and error messages as values
+   */
   validate( form, state ) {
     if ( ! this._isObject( form ) && ! this._isObject( state ) ) return;
 
     if ( 'attributes' in form ) {
       const { attributes } = form;
 
+      // This field is valid until the first error
       this._errors = {
         isValid: true
       };
 
+      // Loop through attributes
       attributes.forEach( attr => {
         const { code, validation } = attr;
 
