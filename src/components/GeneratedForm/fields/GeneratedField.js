@@ -87,6 +87,12 @@ const GeneratedField = ({
       </Form.Field>
     )}
 
+    {/* START:Custom attributes types */}
+  
+    {/* </> */}
+
+    {/* END:Custom attributes types */}
+
     { error && <InlineError text={error} /> }
   </Fragment>
 );

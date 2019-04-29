@@ -1,68 +1,103 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Загальні відомості:
 
-## Available Scripts
+* Технологія [ReactJS](https://reactjs.org/)
+* Додаток на основі [Create React App](https://github.com/facebook/create-react-app)
+* UI бібліотека [semantic-ui-react](https://react.semantic-ui.com/)
+* Плагін календаря [react-datepicker](https://reactdatepicker.com/)
+* [Бриф](https://github.com/unrealhero18/form-generator/blob/master/BRIEF.md)
 
-In the project directory, you can run:
+## Початок роботи
 
-### `npm start`
+* `npm start` - запус в dev режимі
+* `npm run build` - збірка в production режимі
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Структура
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+* `src/components/GeneratedForm` - неймспейс компонента генерації форми
+  * `/GeneratedForm.js` - компонент форми
+  * `/fields/GeneratedField.js` - компонент поля
+  * `/fields/EnumField.js` - компонент поля типу (`enum`)
+  * `/fields/MultipleGeneratedFields.js` - компонент поєднуючий (`multiple`) поля
+  * `/messages/InlineError.js` - компонент для сповіщення помилок валідації
+* `src/lib/Validation.js` - бібліотека валідації
+* `src/utils/fixtures.js` - початкові данні
+* `src/utils/generateHierarchicOptionsList.js` - функція для побудови ієрархічного списку
 
-### `npm test`
+## Для того щоб додати новий вид валідації:
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Використати метод `Validator.prototype.addValidator( name, callback, message )`:
+* `name` - ім'я для валідатора
+* `callback` - функція яка виконує валідацію поля. Отримує 3 параметра:
+  * `value` - значення поля
+  * `option` - параметр валідації
+  * `type` - тип атрибуту (`int, string, date...`)
+* `message` - повідомлення при помилці ( при використанні конструкції `$$validatorName$$`, цей вираз буде підмінено параметром `option` )
 
-### `npm run build`
+```js
+  constructor( props ) {
+    super( props );
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    this.validation = new Validation();
+    this.validator.addValidator( 'step', function( value, option, type ) {
+      if ( ! value ) {
+        return true;
+      } else if ( type !== 'int' ) {
+        return true;
+      } else {
+        return value % option === 0;
+      }
+    }, 'Допустимий крок для значень $$step$$' );
+}
+```
+Або додати валідатор в тілі приватного методу `_initValidators` в бібліотеці `Validation.js`:
+```js
+_initValidators() {
+    this._addValidator( 'required', function( value, enable ) {
+        if ( ! enable ) {
+            return true;
+        } else {
+            return !!value;
+        }
+    });
+}
+```
+_Примітка: при конфігурації min/max для типу date очікується Date об'єкт_
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## Для того щоб додати новий тип атрибута:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Необхідно розширити логіку в компоненті `GeneratedField.js`.
+Опис атрибутів:
+* `error` _(boolean)(required)_ - повідомлення про помилку валідації
+* `name` _(string)(required)_ - ім'я для поля
+* `title` _(string)(optional)_ - текст для <label>
+* `placeholder` _(string)(optional)_ - текст для placeholder
+* `value` _(any)(required)_ - значення для поля ( контролюється за допомогою React state )
+* `onChange` _(function)(equired) - обробник взаємодії з полем
+  * `onChange` - для звичайних текстових полів
+  * `onChangeDate` - для datapicker
+  * `onChangeNumber` - для числових полів ( int|float )
+  * `onCheck`- для checkboxes
+  * `onSelect` - для selects
 
-### `npm run eject`
+```js
+<Fragment>
+    {/* START:Custom attributes types */}
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+    { type === 'textarea' && (
+      <Form.Field
+        className='generated-field _textarea'
+        control='textarea'
+        error={!!error}
+        label={title}
+        name={code}
+        onChange={onChange}
+        rows='3'
+        placeholder={title}
+        value={data}
+      />
+    )}
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+    {/* END:Custom attributes types */}
+</Fragment>
+```
+_Інші доступні елементи форм [Form](https://react.semantic-ui.com/collections/form/)_
