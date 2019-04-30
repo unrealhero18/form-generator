@@ -8,6 +8,8 @@
 
 ## Початок роботи
 
+* `cd ./project-folder` - перехід в папку з проектом
+* `npm install` - встановлення залежностей
 * `npm start` - запус в dev режимі
 * `npm run build` - збірка в production режимі
 
